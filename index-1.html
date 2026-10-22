@@ -1,0 +1,202 @@
+<!doctype html>
+<html lang="th">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>NearMe Food — Test</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
+<style>
+:root{color-scheme:light;--green:#246b4a;--bg:#f5f7f4;--surface:#fff;--text:#202820;--muted:#778078;--line:#e5e9e3;--soft:#edf3ed;--soft2:#e7eee8;--chip:#edf1ec}
+*{box-sizing:border-box}body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:system-ui,-apple-system,sans-serif;transition:background .2s,color .2s}
+body.dark{color-scheme:dark;--green:#7bd6a5;--bg:#111713;--surface:#1b241e;--text:#edf4ee;--muted:#a4b1a7;--line:#344239;--soft:#26372c;--soft2:#293b30;--chip:#29352c}
+body.dark header,body.dark .toolbar,body.dark .detail-top,body.dark .card,body.dark .empty,body.dark .detail-section{background:var(--surface);color:var(--text)}
+body.dark .chip{background:var(--chip);color:var(--text)}
+body.dark .chip.active,body.dark button.primary{background:var(--green);color:#102117}
+body.dark .secondary,body.dark .links a,body.dark .detail-chip,body.dark .back-btn{background:var(--soft2);color:var(--text)}
+body.dark .emoji,body.dark .secondary-link{background:var(--soft);color:var(--text)}
+body.dark .comment-box{background:#111713;color:var(--text);border-color:var(--line)}
+body.dark .hero{background:#26372c}
+body.dark .detail-line,body.dark .review-text{color:#d0dbd2}
+.theme-toggle{width:42px;height:42px;flex:0 0 42px;padding:0;border-radius:50%;display:grid;place-items:center;background:var(--soft2);color:var(--text);font-size:21px;border:1px solid var(--line)}
+.header-row{display:flex;align-items:center;justify-content:space-between;gap:12px}
+
+main{width:100%;max-width:none;margin:0;border:0;border-radius:0;box-shadow:none}header{padding:23px 18px 17px;background:#fff}.brand{font-size:11px;letter-spacing:2px;font-weight:800;color:var(--green)}h1{font-size:25px;margin:7px 0 4px}.muted{color:var(--muted);font-size:13px}
+.toolbar{display:flex;gap:8px;overflow:auto;padding:13px 15px;background:#fff}.chip,button{border:0;border-radius:12px;padding:11px 14px;font-weight:700;white-space:nowrap}.chip{background:#edf1ec;color:#3b493e;border-radius:24px}.chip.active,button.primary{background:var(--green);color:white}
+.actions{display:flex;gap:9px;padding:14px}.actions button{flex:1}.secondary{background:#e7eee8;color:var(--green)}#status{padding:0 17px 12px;font-size:12px;color:var(--muted);min-height:28px}
+#map{height:250px;margin:0 14px;border-radius:16px;overflow:hidden;border:1px solid var(--line)}.heading{display:flex;justify-content:space-between;align-items:center;padding:18px 16px 8px}.heading h2{font-size:18px;margin:0}#results{padding:0 14px 22px}.card{display:flex;gap:12px;background:#fff;border:1px solid var(--line);border-radius:15px;margin:9px 0;padding:13px}.emoji{font-size:24px;background:#edf3ed;border-radius:12px;width:48px;height:48px;display:grid;place-items:center;flex-shrink:0}.info{flex:1;min-width:0}.name{font-weight:800}.meta{font-size:12px;color:var(--muted);margin-top:4px}.dist{font-size:12px;color:var(--green);font-weight:800;white-space:nowrap}.links{display:flex;gap:7px;margin-top:9px;flex-wrap:wrap}.links a{font-size:12px;text-decoration:none;color:var(--green);background:#edf3ed;border-radius:8px;padding:7px 9px;font-weight:700}.empty{padding:24px 17px;text-align:center;background:white;border-radius:15px;color:var(--muted);font-size:13px}.note{font-size:11px;color:#7d877e;line-height:1.6;padding:0 18px 25px}
+
+.detail-page{display:none;background:var(--bg);min-height:100vh}.detail-top{display:flex;align-items:center;gap:12px;padding:14px 16px;background:#fff;border-bottom:1px solid var(--line)}.back-btn{background:#edf3ed;color:var(--green);padding:10px 13px}.detail-title{font-weight:800;font-size:17px}.hero{height:210px;background:#e8eee7;display:flex;align-items:center;justify-content:center;font-size:66px;overflow:hidden}.hero img{width:100%;height:100%;object-fit:cover}.detail-body{padding:16px}.detail-name{font-size:24px;font-weight:850;line-height:1.3}.rating-big{font-size:15px;color:#8b6417;font-weight:800;margin-top:8px}.detail-chip{display:inline-block;background:#e7eee8;color:var(--green);border-radius:20px;padding:6px 10px;font-size:12px;margin:8px 5px 0 0}.detail-section{background:#fff;border:1px solid var(--line);border-radius:15px;padding:14px;margin-top:12px}.detail-section h3{font-size:16px;margin:0 0 10px}.detail-line{font-size:13px;color:#485249;margin:7px 0;line-height:1.5}.review{padding:11px 0;border-top:1px solid var(--line)}.review:first-of-type{border-top:0}.review-name{font-weight:800;font-size:13px}.review-text{font-size:13px;line-height:1.55;margin-top:5px}.review-meta{font-size:11px;color:var(--muted);margin-top:4px}.comment-box{width:100%;min-height:78px;border:1px solid var(--line);border-radius:10px;padding:11px;font:inherit;resize:vertical}.detail-actions{display:flex;gap:8px;margin-top:12px}.detail-actions a{flex:1;text-align:center;text-decoration:none;padding:12px 9px;border-radius:11px;font-size:13px;font-weight:800;background:var(--green);color:white}.detail-actions a.secondary-link{background:#e7eee8;color:var(--green)}.no-photo{font-size:13px;color:var(--muted)}
+</style>
+</head><body><main>
+<header><div class="header-row"><div><div class="brand">NEARME FOOD · TEST BUILD</div><h1>ของอร่อยใกล้คุณ</h1><div class="muted">ค้นหาร้านในรัศมีไม่เกิน 5 กิโลเมตร</div></div><button class="theme-toggle" id="themeToggle" aria-label="เปลี่ยนโหมดสี" title="เปลี่ยนโหมดสี" onclick="toggleTheme()">☾</button></div></header>
+<div class="toolbar" id="filters"><button class="chip active" data-kind="all">ทั้งหมด</button><button class="chip" data-kind="restaurant">ร้านอาหาร</button><button class="chip" data-kind="cafe">คาเฟ่</button><button class="chip" data-kind="snack">ขนม/ของกิน</button></div>
+<div class="actions"><button class="secondary" onclick="locate()">เปิด GPS / ค้นหาอีกครั้ง</button></div>
+<div id="status" style="padding:0 17px 12px;font-size:12px;color:var(--muted);min-height:28px">กำลังตรวจสอบตำแหน่ง GPS…</div>
+<div class="actions" style="padding-top:0"><button class="chip active" id="nearBtn" onclick="setSort('near')">ใกล้ที่สุดก่อน</button><button class="chip" id="ratingBtn" onclick="setSort('rating')">★ คะแนนสูงที่สุด</button></div>
+
+<div class="heading"><h2 id="listTitle">ร้านใกล้คุณที่สุด</h2><span class="muted" id="count">—</span></div><div id="results"><div class="empty" id="emptyState">กำลังรอพิกัด GPS…</div></div>
+<div class="note">ข้อมูลร้านจาก OpenStreetMap · ระยะ 5 กม. เป็นระยะเส้นตรง ไม่ใช่ระยะทางขับรถ<br>หาก GPS ใช้ไม่ได้เมื่อเปิดไฟล์โดยตรง ให้เปิดไฟล์ผ่านเว็บไซต์ HTTPS ใน Chrome และอนุญาตสิทธิ์ตำแหน่ง</div>
+</main>
+<section id="detailPage" class="detail-page">
+  <div class="detail-top"><button class="back-btn" onclick="closeDetail()">← กลับ</button><div class="detail-title">รายละเอียดร้าน</div></div>
+  <div id="detailHero" class="hero">🍽️</div>
+  <div class="detail-body">
+    <div id="detailName" class="detail-name"></div>
+    <div id="detailRating" class="rating-big"></div>
+    <div id="detailTags"></div>
+    <div class="detail-actions"><a id="detailMapLink" target="_blank" rel="noopener">ดูโลเคชั่น / นำทาง ↗</a><a id="detailOsmLink" class="secondary-link" target="_blank" rel="noopener">ข้อมูล OpenStreetMap</a></div>
+    <div class="detail-section"><h3>ข้อมูลร้าน</h3><div id="detailInfo"></div></div>
+    <div class="detail-section"><h3>รูปภาพร้าน</h3><div id="detailPhotos" class="detail-line">ยังไม่มีรูปภาพจากแหล่งข้อมูลที่เชื่อมต่อ</div></div>
+    <div class="detail-section"><h3>รีวิวและคะแนน</h3><div id="detailReviews"></div></div>
+    <div class="detail-section"><h3>ความคิดเห็น</h3><div class="detail-line">พื้นที่สำหรับความคิดเห็นของผู้ใช้ในเวอร์ชันถัดไป</div><textarea id="commentText" class="comment-box" placeholder="เขียนความคิดเห็นส่วนตัวเกี่ยวกับร้านนี้…"></textarea><button class="primary" style="margin-top:9px;width:100%" onclick="saveComment()">บันทึกในหน้านี้</button><div id="commentStatus" class="review-meta"></div></div>
+  </div>
+</section>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+let map=null,user=null,places=[],markers=[],kind='all',sort='near',userMarker=null;
+function applyTheme(theme){
+  const dark=theme==='dark';
+  document.body.classList.toggle('dark',dark);
+  const btn=document.getElementById('themeToggle');
+  if(btn){
+    btn.textContent=dark?'☀':'☾';
+    btn.setAttribute('aria-label',dark?'เปลี่ยนเป็นโหมดสว่าง':'เปลี่ยนเป็นโหมดมืด');
+    btn.title=dark?'เปลี่ยนเป็นโหมดสว่าง':'เปลี่ยนเป็นโหมดมืด';
+  }
+}
+function toggleTheme(){
+  const next=document.body.classList.contains('dark')?'light':'dark';
+  applyTheme(next);
+  try{localStorage.setItem('nearmefood-theme',next)}catch(e){}
+}
+(function initTheme(){
+  let saved='light';
+  try{saved=localStorage.getItem('nearmefood-theme')||'light'}catch(e){}
+  applyTheme(saved);
+})();
+function status(t){const el=document.getElementById('status');if(el)el.textContent=t}
+function showLocationHelp(message){
+  status(message);
+  document.getElementById('count').textContent='รอพิกัด GPS';
+  document.getElementById('results').innerHTML='<div class="empty"><strong>ยังค้นหาร้านไม่ได้</strong><br><br>แอปยังไม่ได้รับพิกัด GPS จึงยังไม่สามารถแสดงร้านในระยะ 5 กม. ได้<br><br>วิธีแก้: เปิดหน้านี้ผ่านเว็บไซต์ HTTPS ใน Chrome แล้วอนุญาตสิทธิ์ตำแหน่ง จากนั้นกด “เปิด GPS / ค้นหาอีกครั้ง”</div>';
+}
+function locate(){
+  if(!navigator.geolocation){
+    showLocationHelp('เบราว์เซอร์นี้ไม่รองรับ GPS กรุณาเปิดผ่าน Chrome รุ่นล่าสุดและเว็บไซต์ HTTPS');
+    return;
+  }
+  const secureOk = window.isSecureContext || location.hostname === 'localhost';
+  if(!secureOk){
+    showLocationHelp('ตรวจพบว่าเปิดจากไฟล์ในเครื่อง (content:// หรือ file://) ซึ่งอาจถูก Chrome จำกัดการใช้ GPS ต้องเปิดผ่าน HTTPS เพื่อให้การระบุตำแหน่งทำงานได้อย่างน่าเชื่อถือ');
+    return;
+  }
+  status('กำลังขอสิทธิ์ตำแหน่ง GPS…');
+  navigator.geolocation.getCurrentPosition(
+    p=>{
+      user={lat:p.coords.latitude,lon:p.coords.longitude};
+      status('รับพิกัด GPS แล้ว ('+user.lat.toFixed(5)+', '+user.lon.toFixed(5)+') กำลังค้นหาร้านใกล้คุณ…');
+      searchNearby();
+    },
+    e=>{
+      if(e.code===1){
+        showLocationHelp('Chrome ยังไม่ได้รับอนุญาตให้ใช้ตำแหน่ง — แตะไอคอนข้างที่อยู่เว็บไซต์ > สิทธิ์เว็บไซต์ > ตำแหน่ง > อนุญาต แล้วโหลดหน้าใหม่');
+      } else if(e.code===2 || e.code===3){
+        showLocationHelp('มือถือยังส่งตำแหน่งไม่ได้หรือหมดเวลารอ กรุณาเปิด Location ในการตั้งค่ามือถือ แล้วลองอีกครั้งในบริเวณที่รับสัญญาณได้ดี');
+      } else {
+        showLocationHelp('อ่านตำแหน่งไม่ได้: '+e.message+' กรุณาตรวจสอบสิทธิ์ Location แล้วลองใหม่');
+      }
+    },
+    {enableHighAccuracy:true,timeout:20000,maximumAge:60000}
+  );
+}
+function dist(a,b,c,d){const r=Math.PI/180,x=(c-a)*r,y=(d-b)*r,q=Math.sin(x/2)**2+Math.cos(a*r)*Math.cos(c*r)*Math.sin(y/2)**2;return 6371*2*Math.asin(Math.sqrt(q))}
+function category(t){if(t.amenity==='cafe'||t.shop==='coffee')return'cafe';if(['bakery','confectionery','pastry','deli','convenience'].includes(t.shop)||t.amenity==='ice_cream')return'snack';return'restaurant'}
+function label(k){return k==='cafe'?'คาเฟ่':k==='snack'?'ขนม/ของกิน':'ร้านอาหาร'}
+function esc(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]))}
+async function searchNearby(){
+ if(!user){locate();return}
+ status('รับพิกัดแล้ว กำลังติดต่อ OpenStreetMap เพื่อค้นหาร้าน…');
+ document.getElementById('count').textContent='กำลังค้นหา…';
+ document.getElementById('results').innerHTML='<div class="empty">ได้รับพิกัด GPS แล้ว กำลังโหลดข้อมูลร้านใกล้คุณ โปรดรอสักครู่…</div>';
+ const q=`[out:json][timeout:20];(node(around:5000,${user.lat},${user.lon})[amenity~"^(restaurant|fast_food|cafe|food_court|ice_cream|pub|bar)$"];way(around:5000,${user.lat},${user.lon})[amenity~"^(restaurant|fast_food|cafe|food_court|ice_cream|pub|bar)$"];relation(around:5000,${user.lat},${user.lon})[amenity~"^(restaurant|fast_food|cafe|food_court|ice_cream|pub|bar)$"];node(around:5000,${user.lat},${user.lon})[shop~"^(bakery|coffee|confectionery|pastry|deli|convenience)$"];way(around:5000,${user.lat},${user.lon})[shop~"^(bakery|coffee|confectionery|pastry|deli|convenience)$"];);out center tags;`;
+ let data=null, lastError=null;
+ for(const endpoint of ['https://overpass-api.de/api/interpreter','https://overpass.kumi.systems/api/interpreter']){
+   const controller=new AbortController();
+   const timer=setTimeout(()=>controller.abort(),18000);
+   try{
+     const response=await fetch(endpoint,{
+       method:'POST',
+       headers:{'Content-Type':'application/x-www-form-urlencoded;charset=UTF-8','Accept':'application/json'},
+       body:'data='+encodeURIComponent(q),
+       signal:controller.signal
+     });
+     if(!response.ok)throw Error('เซิร์ฟเวอร์ตอบกลับ HTTP '+response.status);
+     data=await response.json();
+     break;
+   }catch(err){lastError=err}
+   finally{clearTimeout(timer)}
+ }
+ if(!data){
+   status('เชื่อมต่อบริการค้นหาร้านไม่สำเร็จ กรุณาตรวจอินเทอร์เน็ตแล้วลองอีกครั้ง');
+   document.getElementById('count').textContent='ค้นหาไม่สำเร็จ';
+   document.getElementById('results').innerHTML='<div class="empty"><strong>โหลดข้อมูลร้านไม่ได้</strong><br><br>GPS อาจทำงานแล้ว แต่บริการ OpenStreetMap ไม่ตอบกลับหรือเครือข่ายบล็อกคำขอ<br><br>กด “เปิด GPS / ค้นหาอีกครั้ง” เพื่อลองใหม่</div>';
+   console.warn('NearMe Food Overpass error:',lastError);
+   return;
+ }
+ const seen=new Set();
+ places=(data.elements||[]).map(e=>{
+   const t=e.tags||{},lat=e.lat??e.center?.lat,lon=e.lon??e.center?.lon,name=t.name||t['name:th']||t.brand;
+   if(!name||lat==null||lon==null)return null;
+   const id=e.type+'/'+e.id;if(seen.has(id))return null;seen.add(id);
+   const raw=t.rating||t.stars||t['community:rating'];let rating=raw&&Number(raw);if(!Number.isFinite(rating)||rating<=0)rating=null;
+   return {id,name,lat,lon,t,kind:category(t),km:dist(user.lat,user.lon,lat,lon),rating};
+ }).filter(p=>p&&p.km<=5.0001).sort((a,b)=>a.km-b.km);
+ status(places.length?'รับพิกัด GPS แล้ว — พบข้อมูลร้าน '+places.length+' แห่งในรัศมี 5 กม.':'รับพิกัด GPS แล้ว แต่ OpenStreetMap ไม่มีร้านที่มีชื่อในข้อมูลภายใน 5 กม.');
+ render();
+}
+function setSort(s){sort=s;document.getElementById('nearBtn').classList.toggle('active',s==='near');document.getElementById('ratingBtn').classList.toggle('active',s==='rating');document.getElementById('listTitle').textContent=s==='near'?'ร้านใกล้คุณที่สุด':'ร้านคะแนนสูงที่สุด';render()}
+function render(){markers.forEach(m=>{if(map)map.removeLayer(m)});markers=[];let list=places.filter(p=>kind==='all'||p.kind===kind);if(sort==='rating'){list=list.filter(p=>p.rating!==null);list.sort((a,b)=>b.rating-a.rating||a.km-b.km)}else list.sort((a,b)=>a.km-b.km);document.getElementById('count').textContent=list.length+' ร้าน · ≤ 5 กม.';list.forEach(p=>{let title=`${esc(p.name)}<br>${p.km.toFixed(2)} กม.`+(p.rating?' · ★ '+p.rating:'');if(map)markers.push(L.marker([p.lat,p.lon]).addTo(map).bindPopup(title))});document.getElementById('results').innerHTML=list.length?list.map(p=>`<div class="card" role="button" tabindex="0" onclick="openDetail('${p.id}')" onkeydown="if(event.key==='Enter')openDetail('${p.id}')"><div class="emoji">${p.kind==='cafe'?'☕':p.kind==='snack'?'🥐':'🍜'}</div><div class="info"><div class="name">${esc(p.name)}</div><div class="meta">${label(p.kind)}${p.t.cuisine?' · '+esc(p.t.cuisine):''}</div><div class="meta">${p.rating?'★ '+p.rating+' คะแนน (ข้อมูลจาก OpenStreetMap)':'ไม่มีข้อมูลคะแนนรีวิวใน OpenStreetMap'}${p.t.opening_hours?' · '+esc(p.t.opening_hours):''}</div><div class="links"><a target="_blank" rel="noopener" href="https://www.openstreetmap.org/${p.id}">รายละเอียด</a><a target="_blank" rel="noopener" href="https://www.google.com/maps/dir/?api=1&destination=${p.lat},${p.lon}">นำทาง ↗</a></div></div><div class="dist">${p.km<1?Math.round(p.km*1000)+' ม.':p.km.toFixed(1)+' กม.'}</div></div>`).join(''):'<div class="empty">'+(sort==='rating'?'ไม่มีร้านในรัศมี 5 กม. ที่มีข้อมูลคะแนนรีวิวใน OpenStreetMap':'ไม่พบร้านที่มีข้อมูลในหมวดนี้ภายใน 5 กม.')+'</div>'}
+
+let currentDetail=null;
+function openDetail(id){
+ currentDetail=places.find(p=>p.id===id);if(!currentDetail)return;
+ document.querySelector('main').style.display='none';
+ document.getElementById('detailPage').style.display='block';
+ const p=currentDetail,t=p.t||{};
+ document.getElementById('detailName').textContent=p.name;
+ document.getElementById('detailRating').textContent=p.rating?'★ '+p.rating+' / 5 · คะแนนจากข้อมูล OpenStreetMap':'ยังไม่มีคะแนนรีวิวที่เชื่อถือได้ใน OpenStreetMap';
+ document.getElementById('detailTags').innerHTML='<span class="detail-chip">'+label(p.kind)+'</span><span class="detail-chip">'+(p.km<1?Math.round(p.km*1000)+' เมตร':p.km.toFixed(2)+' กม.')+' จากคุณ</span>';
+ document.getElementById('detailMapLink').href='https://www.google.com/maps/dir/?api=1&destination='+p.lat+','+p.lon;
+ document.getElementById('detailOsmLink').href='https://www.openstreetmap.org/'+p.id;
+ const lines=[];
+ if(t.cuisine)lines.push('ประเภทอาหาร: '+t.cuisine);
+ if(t.opening_hours)lines.push('เวลาเปิด: '+t.opening_hours);
+ if(t.phone)lines.push('โทรศัพท์: '+t.phone);
+ if(t.website)lines.push('เว็บไซต์: '+t.website);
+ if(t['addr:street']||t['addr:housenumber'])lines.push('ที่อยู่: '+[t['addr:housenumber'],t['addr:street'],t['addr:city']].filter(Boolean).join(' '));
+ lines.push('พิกัด: '+p.lat.toFixed(6)+', '+p.lon.toFixed(6));
+ document.getElementById('detailInfo').innerHTML=lines.map(x=>'<div class="detail-line">'+esc(x)+'</div>').join('');
+ const photo=t.image||t['wikimedia_commons'];
+ const photos=document.getElementById('detailPhotos');
+ if(photo&&/^https?:\/\//i.test(photo)){photos.innerHTML='<img alt="รูปภาพร้าน" src="'+esc(photo)+'" style="width:100%;max-height:240px;object-fit:cover;border-radius:10px">'}
+ else if(photo&&photo.startsWith('File:')){photos.innerHTML='<div class="no-photo">มีข้อมูล Wikimedia Commons แต่ต้องเชื่อมต่อระบบดึงภาพเพิ่มเติม</div>'}
+ else{photos.innerHTML='<div class="no-photo">ไม่มีรูปภาพร้านในข้อมูล OpenStreetMap ขณะนี้</div>'}
+ const reviews=document.getElementById('detailReviews');
+ reviews.innerHTML=p.rating?'<div class="review"><div class="review-name">คะแนนจากข้อมูลแผนที่</div><div class="review-text">★ '+p.rating+' / 5</div><div class="review-meta">ข้อมูลนี้อาจไม่ใช่คะแนนรีวิวจากลูกค้าจริง เนื่องจาก OpenStreetMap ไม่ใช่แพลตฟอร์มรีวิวร้านอาหาร</div></div>':'<div class="no-photo">OpenStreetMap ไม่ได้ให้บริการรีวิวและคะแนนลูกค้าโดยตรง จึงยังไม่มีรีวิวจริงให้แสดงในต้นแบบนี้</div>';
+ document.getElementById('commentText').value='';document.getElementById('commentStatus').textContent='';
+ window.scrollTo(0,0);
+}
+function closeDetail(){document.getElementById('detailPage').style.display='none';document.querySelector('main').style.display='block';window.scrollTo(0,0)}
+function saveComment(){const text=document.getElementById('commentText').value.trim();document.getElementById('commentStatus').textContent=text?'ความคิดเห็นนี้แสดงเฉพาะในหน้าทดสอบ ยังไม่ได้บันทึกลงฐานข้อมูล':'กรุณาเขียนความคิดเห็นก่อน'}
+
+document.querySelectorAll('[data-kind]').forEach(b=>{
+  b.addEventListener('click',()=>{
+    document.querySelectorAll('[data-kind]').forEach(x=>x.classList.remove('active'));
+    b.classList.add('active');
+    kind=b.dataset.kind;
+    render();
+  });
+});
+
+// Auto-request location on launch; browser will ask for permission if allowed in current context.
+window.addEventListener('load',()=>{status('กำลังขอตำแหน่ง GPS เพื่อแสดงร้านใกล้ที่สุด…');setTimeout(locate,500)});
+</script></body></html>
